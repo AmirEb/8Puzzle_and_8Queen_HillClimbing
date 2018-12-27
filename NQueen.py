@@ -101,4 +101,4 @@ class NQueenProblem:
         else:
             next.queens = []
             path = []
-return next, path
+            return next, path
