@@ -134,4 +134,4 @@ class NPuzzleProblem:
                 r = random.randrange(0, 4)
                 temp = problem.move(directionsList[r])
             problem = temp
-self.setBoard(problem.board)
+        self.setBoard(problem.board)
