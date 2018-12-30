@@ -12,7 +12,7 @@ class EightPuzzleState:
 
     def __init__( self, numbers ):
 
-        
+
         self.cells = []
         numbers = numbers[:] # Make a copy so as not to cause side-effects.
         numbers.reverse()
@@ -42,7 +42,7 @@ class EightPuzzleState:
             for column in range( 3 ):
                 if self.cells[row][column] == number:
                     return [row,column]
-           
+
 
     def heuristic(self):
         """
@@ -75,8 +75,8 @@ class EightPuzzleState:
         return h
     """
 
- 
-    
+
+
     def legalMoves( self ):
         """
           Returns a list of legal moves from the current state.
@@ -111,8 +111,7 @@ class EightPuzzleState:
         elif(move == 'right'):
             newrow = row
             newcol = col + 1
-        else:
-            raise "Illegal Move"
+
 
         # Create a copy of the current eightPuzzle
         newPuzzle = EightPuzzleState([0, 0, 0, 0, 0, 0, 0, 0, 0])
@@ -192,7 +191,7 @@ class EightPuzzleSearchProblem(search.SearchProblem):
         be composed of legal moves
         """
         return len(actions)
-    
+
 
 EIGHT_PUZZLE_DATA = [[1, 0, 2, 3, 4, 5, 6, 7, 8],
                      [1, 7, 8, 2, 3, 4, 5, 6, 0],
@@ -226,21 +225,6 @@ if __name__ == '__main__':
 	    print(puzzle)
 
 	    problem = EightPuzzleSearchProblem(puzzle)
-	    path1 = search.aStarSearch(problem)
 	    path2 = search.hillClimbing(problem)
-	    path3 = search.simulatedAnnealing(problem)
-	    print('A* found a path of %d moves: %s' % (len(path1), str(path1)))
 	    print('hill climbing found a path of %d moves: %s' % (len(path2), str(path2)))
-	    print('simulated Annealing found a path of %d moves: %s' % (len(path3), str(path3)))
 	    print('\n\n\n')
-	"""this was for seeing puzzle for every move, not needed anymore
-	    curr = puzzle
-	    i = 1
-	    for a in path2:
-	        curr = curr.result(a)
-	        print('After %d move%s: %s' % (i, ("", "s")[i>1], a))
-	        print(curr)
-	        raw_input("Press return for the next state...")   # wait for key stroke
-	        i += 1
-	
-	"""
