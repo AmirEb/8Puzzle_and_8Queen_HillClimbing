@@ -1,4 +1,4 @@
-import search
+import NPuzzleSearch
 import random
 
 # Module Classes
