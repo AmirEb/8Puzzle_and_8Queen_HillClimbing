@@ -34,12 +34,10 @@ class solver:
                 print (s)
                 a.problem.showG()
                 print (" ")
-        s="total agents: "+ str(self.agentCount)
-        print (s)
+
         s="successful agents: "+ str(count)
         print (s)
-        s="success rate: "+ str((count+0.0)*100/self.agentCount) +"%"
-        print (s)
+
 
 
 # just to test class methods
