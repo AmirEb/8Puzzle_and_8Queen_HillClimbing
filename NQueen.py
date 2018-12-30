@@ -1,104 +1,120 @@
 import random
-import math
-from copy import deepcopy, copy
-from pprint import pprint
 
-class NQueenProblem:
 
-    queens = []
-    queens_num = 8
+class queen8:      # stores the 8queen problem data
 
-    def __init__(self, n):
-        self.queens_num = n
+    def __init__(self):
+        """
+        sets an inital table with 8 queens inside it...which in every col & row there is one queen
+        we store the table with the array of queens number of rows
+        """
+        self.queens = [ None for j in range(8) ]
 
-    def getState(self):
-        return self.queens
+        for i in range(8):
+            self.queens[i]=i
 
-    def isGoal(self):
-        return self.heuristic() == 0
+        """ START   <randomally change cols with each other to create a random board which has a queen in every row & col>    START   """
+        for j in range(10):
+            for i in range(8):
+                newcol=random.randint(0,7)
+                     # print newplace
+                temp=self.queens[i]
+                self.queens[i]=self.queens[newcol]
+                self.queens[newcol]=temp
+        """  END    <randomally change cols with each other to create a random board which has a queen in every row & col>     END    """
 
-    def generateRandomBoard(self, hardrate):
-        self.queens = []
-        for i in range(self.queens_num):
-            exists = True
-            while exists:
-                exists = False
+        #print ("class initiated")
 
-                # generate new state
-                state = (random.randrange(self.queens_num), random.randrange(self.queens_num))
 
-                # ignore the checking for the first queen
-                if(len(self.queens) == 0):
-                    self.queens.append(state)
-                    break
 
-                # check if the new state not exists in queens
-                for queen in self.queens:
-                    if state == queen:
-                        exists = True
+    def setQueen(self,queen_number,new_row_number):     # set the position of the queen_number to new_row_number ( by switching the queen col with the other queen's col that have the same row number as new_row_number)
+        if self.queens[queen_number]==new_row_number:
+            return 1        # no action needed
+        other_queen_number=-1;
+        for i in range(8):  # find the other queen number
+            if(self.queens[i]==new_row_number):
+                other_queen_number=i;
+        if other_queen_number==-1:
+            return 0        # invalid row number!
+        self.queens[other_queen_number]=self.queens[queen_number]
+        self.queens[queen_number]=new_row_number
+        return 1            # successful operation
+
+
+    def show(self):         # show the current state of the problem
+        print(self.queens)
+    def showG(self):        # show the current state of the problem (graphical)
+        for i in range(8):
+            s="";
+            spaces=["[ ]","{ }"]        # stands for black & white tiles
+            for j in range(self.queens[i]):
+                s= s + spaces[(j+i)%2]
+            if ((self.queens[i]+i)%2):
+                s=s+"{#}"
+            else:
+                s=s+"[#]"
+            for j in range(8-self.queens[i]-1):
+                s= s + spaces[(self.queens[i]-1+j+i)%2]
+            print (s)
+
+    def is_gurding(self,queen_pose,tile_pose):      # returns true if the queen in queen_pose gurds the tile_pose in board
+        (qx,qy)=queen_pose
+        (tx,ty)=tile_pose
+        if (qx==tx)or(qy==ty):  # straight check
+            return 1
+        if  ((qx-tx)==(qy-ty))or((qx+qy)==(tx+ty)): # diagonal check
+            return 1
+
+
+    def number_of_invalid_queens(self):     # return the number of queens which gurd at least one queen  ---  can be used to set heurisitc function return value
+        result=0
+        for i in range(8):
+           for j in range(8):
+               if not(i==j):
+                   if self.is_gurding( (i,self.queens[i]) , (j,self.queens[j]) ):
+                        result = result+1
                         break
 
-                if not exists:
-                    self.queens.append(state)
-
-
-    # conflict heuristic
+        return result
+    def isSolved(self):
+        if self.number_of_invalid_queens()==0:
+            return 1
+        return 0
     def heuristic(self):
-        conflicts = 0
-        for (x, y) in self.queens:
-            hasConflict = False
-            for di in range(-1, 2):
-                for dj in range(-1, 2):
-                    if (di != 0 or dj != 0) and not hasConflict:
-                        i, j = x, y
-                        condition = self.getCondition(di, dj, i, j)
-                        while condition:
-                            i += di
-                            j += dj
-                            if (i, j) in self.queens and (i, j) != (x, y):
-                                conflicts += 1
-                                hasConflict = True
-                                break
-                            condition = self.getCondition(di, dj, i, j)
-        return conflicts
-        
-    # used in heuristic function
-    def getCondition(self, di, dj, i, j):
-        if (di, dj) == (-1, -1): return i != 0 and j != 0
-        elif (di, dj) == (-1, 0): return i != 0
-        elif (di, dj) == (-1, 1): return i != 0 and j != self.queens_num - 1
-        elif (di, dj) == (0, -1): return j != 0
-        elif (di, dj) == (0, 1): return j != self.queens_num - 1
-        elif (di, dj) == (1, -1): return i != self.queens_num - 1 and j != 0
-        elif (di, dj) == (1, 0): return i != self.queens_num - 1
-        elif (di, dj) == (1, 1): return i != self.queens_num - 1 and j != self.queens_num - 1
+        return self.number_of_invalid_queens()
 
-    def getSuccessors(self):
-        successorsForEachQueens = []
 
-        for queen in self.queens:
-            successors = []
-            for i in range(queen[0] - 1, queen[0] + 2):
-                if i != self.queens_num and i != -1:
-                    for j in range(queen[1] - 1, queen[1] + 2):
-                        if j != self.queens_num and j != -1:
-                            successor, path = self.move(queen, (i, j))
-                            h = successor.heuristic()
-                            if len(successor.queens) != 0 :
-                                successors.append((successor, h, path))
-            successorsForEachQueens += successors
-        return sorted(successorsForEachQueens, key = lambda x: x[1])
+class agent:        # an agent which travers the problem tree
+    def __init__(self,problem):
+        self.problem = problem
+        self.isDone = 0
 
-    def move(self, queen, state):
-        i, j = state
-        next = NQueenProblem(self.queens_num)
-        next.queens = deepcopy(self.queens)
+    def goToNext(self):     # agent goes to the next best state
+        if self.isDone:
+            return  0       # agent is finished
+        besti=-1    # next queen to move
+        nestj=-1    # new place for the queen
+        bestH=8   # 8 is the worst heuristic that the problem can have
+        for i in range(8):
+            p=self.problem      # p is an alias for self.problem...this statement wont back up self.problem in p
+                            #(since there is no any copy constructor in queen8 class...we can't back it up easily...so we have to roll back changes)
+            for j in range(8):
+                oldrow=p.queens[i]      # saves data to roll back the sate later
+                p.setQueen(i,j)
+                temp=p.heuristic()
+                if bestH > p.heuristic():
+                    besti=i
+                    bestj=j
+                    bestH=temp
+                p.setQueen(i,oldrow)    # roll back changes in the problem stored in this agent (since there is no any copy constructor in queen8 class...so we can't back it up easily...we have to roll back changes)
+        if besti == -1:  # there is no any better state(node) in the problem tree (near the current state)
+            self.isDone = 1
+            return 0        # agent is finished
+        if bestH < self.problem.heuristic():
+            self.problem.setQueen(besti,bestj)      # move to the next best state
+#            print self.problem.heuristic()
+#            self.problem.showG()
 
-        if((i, j) not in next.queens):
-            path = [str(next.queens.index(queen)) + " in " + str(queen) + " -> " + str(state)]
-            next.queens.insert(next.queens.index(queen), (i, j))
-            next.queens.remove(queen)
-        else:
-            next.queens = []
-            path = []
-            return next, path
+            return 1            # agent has changed
+        return 0    # there is no any better state(node) in the problem tree (near the current state) ... agent is finished
+
